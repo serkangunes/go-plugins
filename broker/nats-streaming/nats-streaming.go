@@ -1,29 +1,29 @@
-// Package natss provides a NATS Streaming broker
+// Package natsstreaming provides a NATS Streaming broker
 package natsstreaming
 
 import (
 	"context"
 	"strings"
 
-	"github.com/micro/go-micro/broker"
-	"github.com/micro/go-micro/broker/codec/json"
-	"github.com/micro/go-micro/cmd"
-	"github.com/nats-io/go-nats-streaming"
 	"github.com/micro/go-log"
+	"github.com/micro/go-micro/broker"
+	"github.com/micro/go-micro/cmd"
+	"github.com/micro/go-micro/codec/json"
+	"github.com/nats-io/go-nats-streaming"
 )
 
 type nsbroker struct {
-	addrs []string
-	conn  stan.Conn
-	opts  broker.Options
-	nsopts stan.Options
-	clientID string
+	addrs     []string
+	conn      stan.Conn
+	opts      broker.Options
+	nsopts    stan.Options
+	clientID  string
 	clusterID string
 }
 
 type subscriber struct {
-	s    stan.Subscription
-	opts broker.SubscribeOptions
+	s       stan.Subscription
+	opts    broker.SubscribeOptions
 	subject string
 }
 
@@ -159,10 +159,11 @@ func (n *nsbroker) String() string {
 	return "nats-streaming"
 }
 
+//NewBroker returns a new broker
 func NewBroker(opts ...broker.Option) broker.Broker {
 	options := broker.Options{
 		// Default codec
-		Codec:   json.NewCodec(),
+		Codec:   json.Marshaler{},
 		Context: context.Background(),
 	}
 
@@ -179,7 +180,6 @@ func NewBroker(opts ...broker.Option) broker.Broker {
 		PingIterval:        stan.DefaultPingInterval,
 		PingMaxOut:         stan.DefaultPingMaxOut,
 	}
-
 
 	natssOpts := DefaultOptions
 	if n, ok := options.Context.Value(optionsKey{}).(stan.Options); ok {
@@ -204,13 +204,12 @@ func NewBroker(opts ...broker.Option) broker.Broker {
 		return nil
 	}
 
-
 	nb := &nsbroker{
-		opts:  options,
-		nsopts: natssOpts,
-		addrs: setAddrs(options.Addrs),
+		opts:      options,
+		nsopts:    natssOpts,
+		addrs:     setAddrs(options.Addrs),
 		clusterID: clusterID,
-		clientID: clientID,
+		clientID:  clientID,
 	}
 
 	return nb

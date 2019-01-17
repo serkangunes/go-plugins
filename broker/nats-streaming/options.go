@@ -16,12 +16,14 @@ func Options(opts stan.Options) broker.Option {
 
 type clientIDKey struct{}
 
+//ClientID sets the nats streaming client ID as broker option
 func ClientID(clientID string) broker.Option {
 	return setBrokerOption(clientIDKey{}, clientID)
 }
 
 type clusterIDKey struct{}
 
+//ClusterID sets nats streaming cluster ID as broker option
 func ClusterID(clusterID string) broker.Option {
 	return setBrokerOption(clusterIDKey{}, clusterID)
 }
